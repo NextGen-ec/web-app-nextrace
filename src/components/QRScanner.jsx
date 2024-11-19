@@ -10,11 +10,11 @@ console.log('VITE_ROUTE_PRODUCTS', VITE_ROUTE_PRODUCTS);
 const QRScanner = () => {
 const [qrCode, setQrCode] = useState("");
 const [isVerifying, setIsVerifying] = useState(false);
-const [productData, setProductData] = useState(null)
+const [productData, setProductData] = useState({})
 
 const handleFinishVerification = () => {
     setIsVerifying(false);
-    setProductData(null);
+    setProductData({});
     setQrCode("");
 }
 
@@ -31,7 +31,7 @@ const handleScan = (imageSrc) => {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert"});
             if (code) {
-                setQrCode(code);
+                setQrCode(code?.data);
                 console.log("code: ", code);
             }
         }
@@ -40,6 +40,7 @@ const handleScan = (imageSrc) => {
 
 
     const handleVerification = async productCode => {
+        console.log('productCode', productCode);
         setIsVerifying(true);
         try {
         const verification = await apiClient.get(
@@ -55,15 +56,19 @@ const handleScan = (imageSrc) => {
             setIsVerifying(false);
         } catch (error) {
             console.error(error);
+            setIsVerifying(false);
         }};
+
+        console.log('qrCode', qrCode);
+        const hasProductData = Object.keys(productData).length > 0;
 
 return (
     <div>
-        {!productData && (<WebcamCapture onScan={handleScan} />)}
-        {qrCode && !productData && (
-            <div>
-                <p className="text-center my-2">{qrCode.data}</p>
-            </div>
+        {!hasProductData && (<WebcamCapture onScan={handleScan} />)}
+        {!hasProductData && (
+             <div className="my-4">
+             <input value={qrCode} onChange={(e) => setQrCode(e.target.value)}  type="text" id="cfs" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="123ABC" required />
+         </div>
         )}
         {isVerifying && (
             
@@ -76,16 +81,16 @@ return (
             </div>
 
         )}
-        {qrCode && !productData && (
+        {!hasProductData && (
             <div className="text-center">
-                <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => handleVerification(qrCode.data)}>Verify</button>
+                <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 disabled:bg-blue-400 disabled:hover:bg-blue-400" disabled={!qrCode} onClick={() => handleVerification(qrCode)}>Verify</button>
             </div>
         )}
-        {productData && (
+        {hasProductData && (
             <Verification productData={productData} />
         )}
         {/* Boton para regresar a la camara */}
-        {productData && (
+        {!hasProductData || qrCode && (
             <div className="flex justify-end ">
                 <button type="button" className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={() => handleFinishVerification()}>Back</button>
             </div>

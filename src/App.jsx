@@ -3,10 +3,11 @@ import './index.css';
 
 function App() {
   return (
-    <div className="container flex flex-col items-center mx-auto">
+    <div className="container flex flex-col items-center mx-auto px-12 md:px-0">
      
         {/* logo-nextrack.png */}
         <img src="/logo-nextrack.png" alt="Logo Nextrack" className="aspect-auto" />
+        
         <QRScanner />
      
     </div>

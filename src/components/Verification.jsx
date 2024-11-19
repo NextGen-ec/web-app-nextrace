@@ -4,6 +4,7 @@ import { formatDate } from "../utils/dates";
 
  
 function Verification({ productData }) {
+    console.log('productData', productData);
      
     const { 
         DescripcionItem,
@@ -19,7 +20,7 @@ function Verification({ productData }) {
 
 
   return (
-    <div>
+    <div className="container">
       <h1 className="mb-4 text-xl font-bold">{DescripcionItem}</h1>
 
 
