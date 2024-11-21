@@ -1,4 +1,5 @@
-import QRScanner from './components/QRScanner';
+// import QRScanner from './components/QRScanner';
+import Scanner from './components/Scanner';
 import './index.css';
 
 function App() {
@@ -8,8 +9,8 @@ function App() {
         {/* logo-nextrack.png */}
         <img src="/logo-nextrack.png" alt="Logo Nextrack" className="aspect-auto" />
         
-        <QRScanner />
-     
+        {/* <QRScanner /> */}
+        <Scanner/>
     </div>
   );
 }
