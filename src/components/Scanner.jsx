@@ -88,12 +88,12 @@ const handleFinishVerification = () => {
 
   return (
     <div className="" style={{ paddingTop: '2em' }}>
-      <h1 className="font-bold text-xl">Escanea el código QR</h1> 
+      <h1 className="text-center mb-2 font-bold text-xl">Escanea el código QR</h1> 
       <p>Sistema de identificación, marcación, autenticación, rastreo y trazabilidad fiscal de bebidas alcohólicas, cervezas, y cigarrillos.</p>
       {!hasProductData && (
         <>
         
-  <div>
+  <div className='mt-4 mb-2'>
         <button className='btnDefault' onClick={startScan}>Empezar</button>
         <button className='btnOutline' onClick={resetScan}>Reanudar</button>
       </div>
@@ -126,7 +126,7 @@ const handleFinishVerification = () => {
 
       <div className='my-2'>Resultado:</div>
 
-<form className="max-w-md mx-auto" onSubmit={ (e) => { e.preventDefault(); handleVerification(result) } } >   
+<form className="max-w-md" onSubmit={ (e) => { e.preventDefault(); handleVerification(result) } } >   
     <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
     <div className="relative">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
