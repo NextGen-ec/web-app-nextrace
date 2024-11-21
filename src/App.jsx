@@ -4,10 +4,10 @@ import './index.css';
 
 function App() {
   return (
-    <div className="container flex flex-col items-center mx-auto px-12 md:px-0">
+    <div className="container flex flex-col items-center mx-auto px-12 md:px-0 mt-8">
      
         {/* logo-nextrack.png */}
-        <img src="/logo-nextrack.png" alt="Logo Nextrack" className="aspect-auto" />
+        <img src="/logo_nextrack.webp" alt="Logo Nextrack" className="w-48 aspect-auto" />
         
         {/* <QRScanner /> */}
         <Scanner/>
