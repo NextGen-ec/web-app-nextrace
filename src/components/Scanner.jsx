@@ -12,6 +12,19 @@ const QRCodeScanner = () => {
   const codeReader = useRef(new BrowserMultiFormatReader());
 const [isVerifying, setIsVerifying] = useState(false);
 const [productData, setProductData] = useState({})
+const [cameraPermission, setCameraPermission] = useState(false);
+
+const requestCameraPermissions = async () => {
+  try {
+    await navigator.mediaDevices.getUserMedia({ video: true });
+    setCameraPermission(true);
+    console.log('Permisos de cámara ejecutado.');
+    console.log('Permisos de cámara concedidos.');
+  } catch (err) {
+    console.error('Error al solicitar acceso a la cámara:', err);
+    throw new Error('No se pudo acceder a la cámara. Verifique los permisos.');
+  }
+};
 
 const handleFinishVerification = () => {
     setIsVerifying(false);
@@ -20,13 +33,25 @@ const handleFinishVerification = () => {
 }
 
   useEffect(() => {
-    // Obtener lista de dispositivos de video al montar el componente
     const fetchVideoDevices = async () => {
       try {
         const videoInputDevices = await codeReader.current.listVideoInputDevices();
-        setDevices(videoInputDevices);
-        if (videoInputDevices.length > 0) {
-          setSelectedDeviceId(videoInputDevices[0].deviceId);
+        console.log('Dispositivos de video:', videoInputDevices);
+        const videoInputDevicesLength = videoInputDevices.length;
+        // filter device with deviceId undefined
+        const devicesValue = videoInputDevices.filter((device) => device?.deviceId !== undefined);
+        setDevices(devicesValue);
+        if (videoInputDevicesLength > 0) {
+           // Buscar cámara trasera
+          const backCamera = devicesValue.find((device) =>
+            device.label.toLowerCase().includes("facing back")
+          );
+          console.log('backCamera', backCamera);
+
+          // Si no hay cámara trasera, tomar la primera cámara disponible
+           const defaultCamera = backCamera?.deviceId || devicesValue[0]?.deviceId;
+           console.log('defaultCamera', defaultCamera);
+          setSelectedDeviceId(defaultCamera);
         }
       } catch (error) {
         console.error('Error al obtener dispositivos de video:', error);
@@ -39,23 +64,32 @@ const handleFinishVerification = () => {
     return () => {
       codeReader.current.reset();
     };
-  }, []);
+  }, [cameraPermission]);
 
-  const startScan = () => {
-    if (selectedDeviceId && videoRef.current) {
-      codeReader.current.decodeFromVideoDevice(
-        selectedDeviceId,
-        videoRef.current,
-        (result, error) => {
-          if (result) {
-            console.log(result);
-            setResult(result.getText());
+  const startScan = async () => {
+    try {
+
+      if (selectedDeviceId && videoRef.current) {
+        console.log('selectedDeviceId', selectedDeviceId);
+        console.log('videoRef.current', videoRef.current);
+        codeReader.current.decodeFromVideoDevice(
+          selectedDeviceId,
+          videoRef.current,
+          (result, error) => {
+            if (result) {
+              console.log(result);
+              setResult(result.getText());
+            }
+            if (error && !(error instanceof NotFoundException)) {
+              console.error(error);
+            }
           }
-          if (error && !(error instanceof NotFoundException)) {
-            console.error(error);
-          }
-        }
-      );
+        );
+      } else {
+        await requestCameraPermissions();
+      }
+    } catch (error) {
+      console.error('Error al iniciar el escaneo:', error);
     }
   };
 
@@ -114,6 +148,7 @@ const handleFinishVerification = () => {
             id="sourceSelect"
             onChange={(e) => setSelectedDeviceId(e.target.value)}
             style={{ maxWidth: '400px' }}
+            defaultValue={selectedDeviceId}
           >
             {devices.map((device, index) => (
               <option key={index} value={device.deviceId}>
